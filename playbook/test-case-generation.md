@@ -1,12 +1,1 @@
-Generate tests.
-
-Include:
-
-Unit Tests
-Integration Tests
-API Tests
-Regression Tests
-Edge Cases
-Negative Cases
-
-Show expected coverage.
+kpi.md, prd.md by refering this file genrate proper and crisp test cases file test_specification_flutter.md
