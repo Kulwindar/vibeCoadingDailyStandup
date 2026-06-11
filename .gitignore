@@ -1,0 +1,113 @@
+# ==============================================================================
+# Gitignore for React Frontend & Node.js Backend Enterprise Application
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. Dependency Directories (Frontend & Backend)
+# ------------------------------------------------------------------------------
+node_modules/
+jspm_packages/
+web_stage/
+.pnpm-store/
+
+# ------------------------------------------------------------------------------
+# 2. Build and Production Outputs
+# ------------------------------------------------------------------------------
+# Production build outputs
+dist/
+build/
+out/
+
+# Cache directories
+.cache/
+.parcel-cache/
+.eslintcache/
+.stylelintcache/
+.tsbuildinfo/
+node_modules/.cache/
+
+# Vite specific
+dist-ssr/
+*.local
+
+# ------------------------------------------------------------------------------
+# 3. Environment Variables and Secrets (CRITICAL SECURITY)
+# ------------------------------------------------------------------------------
+# Prevent pushing sensitive keys, secrets, or configurations
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*.local
+*.env
+*.pem
+*.key
+*.cert
+*.p12
+
+# ------------------------------------------------------------------------------
+# 4. Databases and Local Storage (Backend specific)
+# ------------------------------------------------------------------------------
+# Ignore local database files and sqlite artifacts
+*.db
+*.sqlite
+*.sqlite3
+database.sqlite
+database.sqlite-journal
+database.sqlite-shm
+database.sqlite-wal
+
+# Dump files
+*.sql
+*.dump
+
+# Redis / memory stores local dumps
+dump.rdb
+
+# ------------------------------------------------------------------------------
+# 5. Log Files and Diagnostics
+# ------------------------------------------------------------------------------
+# Log files
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Diagnostic reports (CRA/Vite/Node)
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# ------------------------------------------------------------------------------
+# 6. Testing & Coverage
+# ------------------------------------------------------------------------------
+coverage/
+.nyc_output/
+jest-html-report/
+cypress/videos/
+cypress/screenshots/
+.screenshot/
+
+# ------------------------------------------------------------------------------
+# 7. IDE, Editors, and OS-Specific Metadata
+# ------------------------------------------------------------------------------
+# Editor settings
+.vscode/
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+ehthumbs.db
+desktop.ini
