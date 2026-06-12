@@ -9,7 +9,7 @@ Always respect the instructions defined in:
 
 
 ## Critical Constraints
-1. No filler or code explanations. Output qnly code changes/diffs.
+1. No filler or code explanations. Output only code changes/diffs.
 2. Do not update secondary files (README, logs, tests, etc.) unless requested.
 3. Run project in command terminal (not agent chat). Do not commit/push without confirmation.
 4. Document Rule: Use only content from referenced documents. No assumptions, additions, enhancements, or inferred requirements. If unclear, ask.
