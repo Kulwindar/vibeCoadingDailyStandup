@@ -27,14 +27,20 @@ import request from 'supertest';
 import app from '../app';
 import { StandupRepository } from '../repositories/standup.repository';
 import { DigestRepository } from '../repositories/digest.repository';
+import { BlockerPredictionRepository } from '../repositories/blocker-prediction.repository';
+import { KudosRepository } from '../repositories/kudos.repository';
 
 const standupRepo = new StandupRepository();
 const digestRepo = new DigestRepository();
+const blockerPredictionRepo = new BlockerPredictionRepository();
+const kudosRepo = new KudosRepository();
 
 describe('Daily Standup System - API Endpoints', () => {
   beforeEach(() => {
     standupRepo.deleteAll();
     digestRepo.deleteAll();
+    blockerPredictionRepo.deleteAll();
+    kudosRepo.deleteAll();
   });
 
   describe('POST /api/v1/standups', () => {
@@ -206,6 +212,182 @@ describe('Daily Standup System - API Endpoints', () => {
       expect(res.status).toBe(200);
       expect(res.body.data.digest_sent).toBe(true);
       expect(res.body.data.recipient).toBeDefined();
+    });
+  });
+
+  // V2 Tests - Kudos System
+  describe('POST /api/v1/kudos', () => {
+    it('should submit kudos successfully', async () => {
+      const res = await request(app)
+        .post('/api/v1/kudos')
+        .send({
+          from_member: 'priya@company.com',
+          to_member: 'arjun@company.com',
+          message: 'Thanks for the help!'
+        });
+
+      expect(res.status).toBe(201);
+      expect(res.body.data.points).toBe(10);
+      expect(res.body.data.from_member).toBe('Priya Sharma');
+      expect(res.body.data.to_member).toBe('Arjun Mehta');
+    });
+
+    it('should reject kudos from unknown sender', async () => {
+      const res = await request(app)
+        .post('/api/v1/kudos')
+        .send({
+          from_member: 'unknown@company.com',
+          to_member: 'arjun@company.com',
+          message: 'Thanks!'
+        });
+
+      expect(res.status).toBe(404);
+      expect(res.body.data.code).toBe('MEMBER_NOT_FOUND');
+    });
+
+    it('should reject kudos exceeding daily limit', async () => {
+      // Submit 5 kudos from Priya to Arjun
+      for (let i = 0; i < 5; i++) {
+        await request(app)
+          .post('/api/v1/kudos')
+          .send({
+            from_member: 'priya@company.com',
+            to_member: 'arjun@company.com',
+            message: `Thanks ${i + 1}!`
+          });
+      }
+
+      const res = await request(app)
+        .post('/api/v1/kudos')
+        .send({
+          from_member: 'priya@company.com',
+          to_member: 'arjun@company.com',
+          message: 'Thanks again!'
+        });
+
+      expect(res.status).toBe(429);
+      expect(res.body.data.code).toBe('KUDOS_LIMIT_EXCEEDED');
+    });
+  });
+
+  describe('GET /api/v1/kudos/leaderboard', () => {
+    it('should return kudos leaderboard', async () => {
+      await request(app)
+        .post('/api/v1/kudos')
+        .send({
+          from_member: 'priya@company.com',
+          to_member: 'arjun@company.com',
+          message: 'Great work!'
+        });
+
+      const res = await request(app).get('/api/v1/kudos/leaderboard');
+      expect(res.status).toBe(200);
+      expect(res.body.data.leaderboard).toHaveLength(1);
+      expect(res.body.data.leaderboard[0].points).toBe(10);
+    });
+  });
+
+  describe('GET /api/v1/kudos/feed', () => {
+    it('should return recent kudos feed', async () => {
+      await request(app)
+        .post('/api/v1/kudos')
+        .send({
+          from_member: 'priya@company.com',
+          to_member: 'arjun@company.com',
+          message: 'Thanks!'
+        });
+
+      const res = await request(app).get('/api/v1/kudos/feed');
+      expect(res.status).toBe(200);
+      expect(res.body.data.kudos).toHaveLength(1);
+      expect(res.body.data.total).toBe(1);
+    });
+  });
+
+  // V2 Tests - Analytics
+  describe('GET /api/v1/analytics/sprint', () => {
+    it('should return sprint analytics', async () => {
+      const today = new Date().toISOString().split('T')[0];
+      const res = await request(app).get(`/api/v1/analytics/sprint?date=${today}`);
+      
+      expect(res.status).toBe(200);
+      expect(res.body.data.velocity_score).toBeDefined();
+      expect(res.body.data.trend).toBeInstanceOf(Array);
+    });
+
+    it('should reject invalid date format', async () => {
+      const res = await request(app).get('/api/v1/analytics/sprint?date=12-31-2026');
+      expect(res.status).toBe(400);
+      expect(res.body.data.code).toBe('INVALID_DATE_FORMAT');
+    });
+  });
+
+  // V2 Tests - Archive
+  describe('GET /api/v1/archive/search', () => {
+    it('should return search results', async () => {
+      await request(app)
+        .post('/api/v1/standups')
+        .send({
+          member_name: 'Priya Sharma',
+          member_email: 'priya@company.com',
+          yesterday: 'Completed API integration',
+          today: 'Working on tests',
+          blockers: 'None'
+        });
+
+      const res = await request(app).get('/api/v1/archive/search?q=API');
+      expect(res.status).toBe(200);
+      expect(res.body.data.results).toBeInstanceOf(Array);
+      expect(res.body.data.total).toBeGreaterThanOrEqual(0);
+    });
+
+    it('should reject date range exceeding 90 days', async () => {
+      const res = await request(app).get('/api/v1/archive/search?date_from=2026-01-01&date_to=2026-04-30');
+      expect(res.status).toBe(400);
+      expect(res.body.data.code).toBe('DATE_RANGE_EXCEEDED');
+    });
+  });
+
+  describe('GET /api/v1/archive/export', () => {
+    it('should export standups as CSV', async () => {
+      const res = await request(app).get('/api/v1/archive/export?format=csv');
+      expect(res.status).toBe(200);
+      expect(res.headers['content-type']).toContain('text/csv');
+    });
+
+    it('should export standups as JSON', async () => {
+      const res = await request(app).get('/api/v1/archive/export?format=json');
+      expect(res.status).toBe(200);
+      expect(res.headers['content-type']).toContain('application/json');
+    });
+  });
+
+  // V2 Tests - Blocker Detection
+  describe('POST /api/v1/blockers/analyze', () => {
+    it('should analyze blockers with severity', async () => {
+      const res = await request(app)
+        .post('/api/v1/blockers/analyze')
+        .send({
+          standup_id: 'test-id',
+          blockers: 'Waiting on API response from backend team'
+        });
+
+      expect(res.status).toBe(200);
+      expect(res.body.data.severity).toBeDefined();
+      expect(res.body.data.confidence).toBeGreaterThan(0);
+    });
+
+    it('should reject low-confidence blockers', async () => {
+      const res = await request(app)
+        .post('/api/v1/blockers/analyze')
+        .send({
+          standup_id: 'test-id',
+          blockers: 'none'
+        });
+
+      expect(res.status).toBe(200);
+      expect(res.body.data.severity).toBe('NONE');
+      expect(res.body.data.flagged).toBe(false);
     });
   });
 });

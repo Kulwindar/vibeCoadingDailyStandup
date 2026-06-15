@@ -4,8 +4,8 @@ import { Standup } from '../types';
 export class StandupRepository {
   create(standup: Standup): void {
     const stmt = db.prepare(`
-      INSERT INTO standups (id, member_name, member_email, yesterday, today, blockers, submitted_at, date)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO standups (id, member_name, member_email, yesterday, today, blockers, submitted_at, date, source)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
     stmt.run(
       standup.id,
@@ -15,7 +15,36 @@ export class StandupRepository {
       standup.today,
       standup.blockers,
       standup.submitted_at,
-      standup.date
+      standup.date,
+      'web'
+    );
+  }
+
+  createWithSource(standup: {
+    id: string;
+    member_name: string;
+    member_email: string;
+    yesterday: string;
+    today: string;
+    blockers: string;
+    submitted_at: string;
+    date: string;
+    source: string;
+  }): void {
+    const stmt = db.prepare(`
+      INSERT INTO standups (id, member_name, member_email, yesterday, today, blockers, submitted_at, date, source)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `);
+    stmt.run(
+      standup.id,
+      standup.member_name,
+      standup.member_email,
+      standup.yesterday,
+      standup.today,
+      standup.blockers,
+      standup.submitted_at,
+      standup.date,
+      standup.source
     );
   }
 
