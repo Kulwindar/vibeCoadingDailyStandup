@@ -92,6 +92,13 @@ export const standupApi = createApi({
         return `/archive/search?${searchParams.toString()}`;
       },
       providesTags: ['Archive']
+    }),
+    clearAllData: builder.mutation<ApiResponse<any>, void>({
+      query: () => ({
+        url: '/dev/clear-all',
+        method: 'POST'
+      }),
+      invalidatesTags: ['Members', 'Digest', 'Kudos', 'Analytics', 'Archive']
     })
   })
 });
@@ -107,5 +114,6 @@ export const {
   useSubmitKudosMutation,
   useGetSprintAnalyticsQuery,
   useSearchArchiveQuery,
+  useClearAllDataMutation,
   util: { resetApiState }
 } = standupApi;

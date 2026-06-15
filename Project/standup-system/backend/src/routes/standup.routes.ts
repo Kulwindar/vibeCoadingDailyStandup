@@ -40,4 +40,7 @@ router.get('/kudos/feed', kudosController.getFeed);
 router.get('/archive/search', archiveController.search);
 router.get('/archive/export', archiveController.exportData);
 
+// Dev-only route - clear all data
+router.post('/dev/clear-all', standupController.clearAllData);
+
 export default router;

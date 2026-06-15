@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { 
   useGetDigestQuery, 
   useSendDigestMutation, 
-  useGetDigestStatusQuery 
+  useGetDigestStatusQuery,
+  useClearAllDataMutation
 } from '../services/api';
 import { 
   Calendar, 
@@ -12,7 +13,8 @@ import {
   CheckCircle, 
   HelpCircle,
   Loader,
-  RefreshCw
+  RefreshCw,
+  Trash2
 } from 'lucide-react';
 
 export const Dashboard: React.FC = () => {
@@ -31,6 +33,7 @@ export const Dashboard: React.FC = () => {
   const { data: digestResponse, isLoading: loadingDigest, refetch } = useGetDigestQuery(date);
   const { data: statusResponse, refetch: refetchStatus } = useGetDigestStatusQuery(date);
   const [sendDigest, { isLoading: sendingEmail }] = useSendDigestMutation();
+  const [clearAllData, { isLoading: clearing }] = useClearAllDataMutation();
 
   const digest = digestResponse?.data;
   const status = statusResponse?.data;
@@ -48,6 +51,18 @@ export const Dashboard: React.FC = () => {
       }
     } catch (err: any) {
       setEmailError(err?.data?.message || 'Failed to dispatch email digest.');
+    }
+  };
+
+  const handleClearAll = async () => {
+    if (window.confirm('Are you sure? This will delete ALL data from ALL tables.')) {
+      try {
+        await clearAllData().unwrap();
+        refetch();
+        refetchStatus();
+      } catch (err: any) {
+        console.error('Clear failed:', err);
+      }
     }
   };
 
@@ -101,6 +116,16 @@ export const Dashboard: React.FC = () => {
             )}
           </button>
         </form>
+        <button
+          type="button"
+          onClick={handleClearAll}
+          disabled={clearing}
+          className="flex items-center space-x-1.5 px-3 py-2 bg-rose-600/20 text-rose-400 rounded-lg hover:bg-rose-600/30 transition disabled:opacity-50 text-sm"
+          title="Clear all data (development only)"
+        >
+          <Trash2 className="w-4 h-4" />
+          <span>Clear All</span>
+        </button>
       </div>
 
       {/* Toast Notifications */}

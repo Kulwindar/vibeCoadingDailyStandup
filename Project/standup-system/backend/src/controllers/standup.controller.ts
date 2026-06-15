@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { StandupService } from '../services/standup.service';
 import { EmailService } from '../services/email.service';
 import { DigestRepository } from '../repositories/digest.repository';
+import { StandupRepository } from '../repositories/standup.repository';
 import { standupSchema, digestSendSchema } from '../validations/standup.validation';
 import * as yup from 'yup';
 
@@ -157,6 +158,32 @@ export class StandupController {
           recipient: process.env.MANAGER_EMAIL || 'manager@company.com',
           submissions_included: this.standupService.getDigest(dateVal).submitted_count
         }
+      });
+    } catch (err: any) {
+      return res.status(500).json({
+        status: 500,
+        message: `INTERNAL_SERVER_ERROR: ${err.message}`,
+        data: null
+      });
+    }
+  };
+
+  clearAllData = async (req: Request, res: Response, next: NextFunction) => {
+    if (process.env.NODE_ENV === 'production') {
+      return res.status(403).json({
+        status: 403,
+        message: 'CLEAR_DATA_FORBIDDEN: This endpoint is disabled in production.',
+        data: { code: 'CLEAR_DATA_FORBIDDEN' }
+      });
+    }
+
+    try {
+      const standupRepo = new StandupRepository();
+      standupRepo.clearAll();
+      return res.status(200).json({
+        status: 200,
+        message: 'success',
+        data: { cleared: true, tables: ['standups', 'digest_logs', 'blocker_predictions', 'kudos', 'kudos_decay_log'] }
       });
     } catch (err: any) {
       return res.status(500).json({

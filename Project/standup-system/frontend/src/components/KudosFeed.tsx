@@ -54,21 +54,21 @@ export const KudosFeed: React.FC = () => {
 
   return (
     <div className="glass p-6 rounded-xl">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center space-x-2">
-          <Heart className="w-5 h-5 text-rose-500" />
-          <h2 className="text-xl font-semibold text-white">Kudos Feed</h2>
-        </div>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="flex items-center space-x-1 px-3 py-1.5 bg-rose-600/20 text-rose-400 rounded-lg hover:bg-rose-600/30 transition text-sm"
-        >
-          {showForm ? <X className="w-4 h-4" /> : <Send className="w-4 h-4" />}
-          <span>{showForm ? 'Cancel' : 'Send Kudos'}</span>
-        </button>
-      </div>
+<div className="flex items-center justify-between mb-4">
+         <div className="flex items-center space-x-2">
+           <Heart className="w-5 h-5 text-rose-500" />
+           <h2 className="text-xl font-semibold text-white">Kudos Feed</h2>
+         </div>
+         <button
+           onClick={() => setShowForm(!showForm)}
+           className="flex items-center space-x-2 px-3 py-1.5 bg-rose-600/20 text-rose-400 rounded-lg hover:bg-rose-600/30 transition text-sm"
+         >
+           {showForm ? <X className="w-4 h-4" /> : <Send className="w-4 h-4" />}
+           <span>{showForm ? 'Cancel' : 'Send Kudos'}</span>
+         </button>
+       </div>
 
-      {showForm && (
+       {showForm && (
         <form onSubmit={handleSubmit} className="glass p-4 rounded-lg mb-4 border border-rose-500/20">
           <div className="space-y-3">
             <select

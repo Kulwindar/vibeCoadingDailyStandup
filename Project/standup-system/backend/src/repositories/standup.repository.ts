@@ -65,4 +65,14 @@ export class StandupRepository {
   deleteAll(): void {
     db.prepare('DELETE FROM standups').run();
   }
+
+  clearAll(): void {
+    db.prepare('DELETE FROM kudos').run();
+    db.prepare('DELETE FROM kudos_decay_log').run();
+    db.prepare('DELETE FROM blocker_predictions').run();
+    db.prepare('DELETE FROM digest_logs').run();
+    db.prepare('DELETE FROM standups').run();
+    // Rebuild FTS5 index
+    db.prepare('INSERT INTO standups_fts(standups_fts) VALUES(\'rebuild\')').run();
+  }
 }
