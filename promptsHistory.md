@@ -34,3 +34,15 @@
 
 ### 11. Maintain promptsHistory.md, Collect existing prompts from this conversation/context and append all future prompts. Store only title, purpose, and my exact prompt text. Preserve verbatim; no rewriting. Keep categorized and deduplicated. No extra metadata.
 - Asked to maintain promptsHistory.md file with exact prompt text, no extra metadata
+
+### 12. Refer @agents/ folders v2 files. Cover all requirements with happy, edge, and negative test cases, expected results, and priority. Ensure traceability and support automated pass/fail execution. Update only `TEST_SPEC.md` and it should only have testcaseid, desc and output.
+- Asked to create TEST_SPEC.md for V2 features and execute all tests
+
+### 13. Called the Read tool with the following input: {"filePath":"/Users/apple/Downloads/vibeCoadingDailyStandup/TEST_SPEC.md"}
+- Requested to read TEST_SPEC.md
+
+### 14. Refer @agents/ folders v2 files. Cover all requirements with happy, edge, and negative test cases, expected results, and priority. Ensure traceability and support automated pass/fail execution. Update only `TEST_SPEC.md` and it should only have testcaseid, desc and output.
+- Asked to create TEST_SPEC.md for V2 features and execute all tests
+
+### 15. Refer @agents/ folders v2 files. Cover all requirements with happy, edge, and negative test cases, expected results, and priority. Ensure traceability and support automated pass/fail execution. Update only `TEST_SPEC.md` and it should only have testcaseid, desc and output.
+- Asked to execute tests and create TEST_SUMMARY.md
